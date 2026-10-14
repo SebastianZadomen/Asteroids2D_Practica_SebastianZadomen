@@ -22,16 +22,26 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // TODO: Singleton (igual que amb les pools).
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
 
     }
 
     private void Start()
     {
-        // TODO: inicialitza el joc.
-        //   score = 0, lives = startingLives, IsGameOver = false
-        //   amaga el panell GameOver
-        //   Crida UpdateUI().
+
+        score = 0;
+        lives = startingLives;
+        IsGameOver = false;
+        gameOverPanel.SetActive(false);
+        UpdateUI();
+       
 
     }
 
@@ -39,6 +49,8 @@ public class GameManager : MonoBehaviour
     public void AddScore(int points)
     {
         // TODO: afegeix punts a la UI i actualitza-la.
+        score += points;
+        UpdateUI();
     }
 
     // Cridat pel Ateroid quan impacta amb el player.
@@ -47,15 +59,20 @@ public class GameManager : MonoBehaviour
         // TODO: Resta amount a lives i actualitza la UI.
         //       si lives < 0 GameOver().
         //       Extra: si el joc ja ha terminat no facis res
+        lives -= amount;
+        UpdateUI();
+
+        if (lives < 0)
+        {
+            GameOver();
+        }
 
     }
 
     private void GameOver()
     {
-        // TODO:
-        //     IsGameOver = true
-        //     Fes aparèixer el panell de GameOver
-        //     Congela el joc Time.timeScale = 0
+        IsGameOver = true;
+        Time.timeScale = 0;
 
     }
 
@@ -66,10 +83,14 @@ public class GameManager : MonoBehaviour
         //     Time.timeScale = 1   (si no fas això reiniciarà congelat)
         //     fes un reload de l'escena:
         //     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void UpdateUI()
     {
+        livesText.text = $"Live : {lives}";
+        scoreText.text = $"Score : {score}";
         // TODO: escriu les vides i els punts als textos.
         //   Exemple: scoreText.text = "Punts: " + score;
     }
